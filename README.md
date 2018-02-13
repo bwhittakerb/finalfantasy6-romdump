@@ -1,2 +1,8 @@
-# finalfantasy6-romdump
-The internals of a twitter bot that decodes compressed text from FF6's original translation from a mounted binary cart ROM.
+# Final Fantasy VI - Script Romdumper
+### Function
+This library was created to support a twitter bot [@PleaseBeExcited](https://twitter.com/pleasebeexcited). The bot imports **ff6romtextdecodelib.py** and, on a semi-randomized interval, calls **getQuote(140)** from it. (Having made this back in the good old days when Twitter enforced shorter tweets).
+
+**ff6romtextdecodelib.py** opens a common binary Super Nintendo Cartridge ROM dump file of Final Fantasy VI (Final Fantasy III in the USA). It chooses a random byterange from the area of the ROM file that contained the game's script of the length specified in the argument. It then uses a dict which contains all the byte substitutions used to compress the text to fit on the storage-constrained cartridge to return ASCII characters. Since the byterange will always return at least as many characters and more likely closer to double the number of ASCII characters as the maxLength due to compression, the function then removes each word from the end of the snippet until the quote is at or under the specified maxLength. This prevents it from cutting off in the middle of a word.
+
+### SNES Text Compression
+Cartridge space didn't come cheap and verbose games such as RPGs required tricks to save space. In order to reduce the amount of storage taken up with text for FF6, a frequency analysis on the most common two-character groupings was performed. They were then assigned to the bytes adjacent to the bytes that ANSI text uses to specify the standard set. For example: the hexadecimal byte `0xA7` stored 'll'. English often has words that pair two 'l's together ('spell', 'llama', 'Sally'). Instead of storing each l in a separate byte, the cartridge could store it in one. Any part of a word that couldn't be represented by these two-letter pairings would fall back to a one-byte-per-letter representation.
